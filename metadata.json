@@ -1,0 +1,6 @@
+{
+  "name": "Rahnuma - Women Career & Skill Navigator",
+  "description": "AI-powered career guidance, job matching, and skill development roadmap for women in Pakistan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
