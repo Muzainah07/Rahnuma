@@ -10,7 +10,6 @@ import BrowseDirectory from '@/components/BrowseDirectory';
 import CareerCoachChat from '@/components/CareerCoachChat';
 import CareerDashboard from '@/components/CareerDashboard';
 import ResumeAnalyzer from '@/components/ResumeAnalyzer';
-import AdminPanel from '@/components/AdminPanel';
 import CommunityMentors from '@/components/CommunityMentors';
 import AuthModal from '@/components/AuthModal';
 import ContactModal from '@/components/ContactModal';
@@ -79,10 +78,6 @@ export default function ClientDashboard({
 
   const handleRemoveSavedJob = (jobId) => {
     setSavedJobs(savedJobs.filter(j => j.job_id !== jobId));
-  };
-
-  const handleAddJob = (newJob) => {
-    setJobsList([newJob, ...jobsList]);
   };
 
   const hasResults = !!recommendationData;
@@ -191,15 +186,6 @@ export default function ClientDashboard({
 
         {activeTab === 'community' && (
           <CommunityMentors />
-        )}
-
-        {activeTab === 'admin' && (
-          <AdminPanel
-            jobs={jobsList}
-            courses={initialCourses}
-            sampleProfiles={initialSampleProfiles}
-            onAddJob={handleAddJob}
-          />
         )}
 
         {activeTab === 'chat' && (

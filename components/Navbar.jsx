@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Compass, Sparkles, Briefcase, BookOpen, Search, MessageSquare, User, FileText, ShieldCheck, Users, LogOut, ChevronDown } from 'lucide-react';
+import { Compass, Sparkles, Briefcase, Search, MessageSquare, User, FileText, Users, LogOut, ChevronDown } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, hasResults, currentUser, onOpenAuth, onLogout }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -107,16 +107,6 @@ export default function Navbar({ activeTab, setActiveTab, hasResults, currentUse
           >
             <Users className="w-3.5 h-3.5" />
             <span>Success Stories</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5 ${
-              activeTab === 'admin' ? 'bg-[#5c1d2d] text-white shadow-sm' : 'text-slate-700 hover:bg-[#5c1d2d]/10'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Employer / Admin</span>
           </button>
         </nav>
 
