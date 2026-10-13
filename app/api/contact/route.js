@@ -1,7 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
-// In-memory store for support tickets in development (connects to database in production)
+export const dynamic = 'force-dynamic';
+
 global.supportTickets = global.supportTickets || [];
 
 export async function GET() {

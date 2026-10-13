@@ -1,6 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
@@ -34,7 +36,7 @@ INSTRUCTIONS:
 2. For each recommended job, provide:
    - job_id: A unique code (e.g. "JOB-01", "JOB-02")
    - title: Job title
-   - category: Job category (e.g., Software & Tech, Content, Marketing, Finance, Customer Support)
+   - category: Job category (e.g., Software & Tech, Content, Marketing, Finance, Healthcare)
    - location: City or Remote
    - job_type: Full-time / Part-time / Remote
    - company: A realistic company name in Pakistan or international remote employer

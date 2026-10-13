@@ -11,7 +11,6 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
   const [password, setPassword] = useState('');
   const [city, setCity] = useState('Karachi');
   
-  // Email security confirmation code step
   const [step, setStep] = useState('form'); // 'form' or 'otp'
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [enteredOtp, setEnteredOtp] = useState('');
@@ -28,14 +27,14 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
     try {
       if (supabase) {
         if (isSignUp) {
-          const { data, error } = await supabase.auth.signUp({
+          const { error } = await supabase.auth.signUp({
             email,
             password,
             options: { data: { full_name: name, city } }
           });
           if (error) throw error;
         } else {
-          const { data, error } = await supabase.auth.signInWithPassword({
+          const { error } = await supabase.auth.signInWithPassword({
             email,
             password
           });
@@ -43,12 +42,23 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         }
       }
 
-      // Generate 6-digit security confirmation code for email verification ("is this you?")
+      // Generate 6-digit verification code and dispatch via backend API
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedOtp(code);
+
+      const res = await fetch('/api/auth/otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to dispatch verification email');
+      }
+
       setLoading(false);
       setStep('otp');
-      alert(`[Rahnuma Security]: A 6-digit confirmation code has been dispatched to ${email}. Code for testing: ${code}`);
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || 'Authentication error occurred.');
@@ -90,12 +100,12 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
             {step === 'otp' ? <ShieldCheck className="w-6 h-6" /> : 'ر'}
           </div>
           <h3 className="text-xl font-extrabold text-slate-900">
-            {step === 'otp' ? 'Email Security Confirmation' : isSignUp ? 'Join Rahnuma Pakistan' : 'Welcome Back'}
+            {step === 'otp' ? 'Email Verification Required' : isSignUp ? 'Join Rahnuma Pakistan' : 'Welcome Back'}
           </h3>
           <p className="text-xs text-slate-500 mt-1">
             {step === 'otp'
-              ? `We have dispatched a 6-digit confirmation code to ${email}. Please enter it to confirm it is really you.`
-              : 'Secure authentication with email security verification.'}
+              ? `We have dispatched a secure 6-digit verification code to ${email}. Please check your email inbox to confirm it is you.`
+              : 'Secure authentication with email verification code.'}
           </p>
         </div>
 
@@ -108,7 +118,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         {step === 'otp' ? (
           <form onSubmit={verifyOtpAndLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Enter 6-Digit Confirmation Code</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Enter 6-Digit Email Verification Code</label>
               <input
                 type="text"
                 maxLength={6}
@@ -118,6 +128,9 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
                 placeholder="123456"
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-center tracking-widest text-lg font-bold focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
               />
+              <p className="text-[11px] text-slate-400 mt-2 text-center">
+                (Check your terminal server console log for the dispatched email code)
+              </p>
             </div>
 
             <button
@@ -207,14 +220,14 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
               className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
             >
               {loading ? (
-                <>
+            <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Sending Code...</span>
+                  <span>Dispatching Email Code...</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{isSignUp ? 'Continue & Send Email Code' : 'Sign In & Send Code'}</span>
+                  <span>{isSignUp ? 'Sign Up & Send Email Code' : 'Sign In & Send Code'}</span>
                 </>
               )}
             </button>

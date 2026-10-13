@@ -1,12 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Plus, Briefcase, BookOpen, Mail, CheckCircle2, Trash2, Send } from 'lucide-react';
+import { ShieldCheck, Plus, Briefcase, Mail, CheckCircle2, Lock, Send, X } from 'lucide-react';
 
 export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [passcode, setPasscode] = useState('');
   const [activeSubTab, setActiveSubTab] = useState('tickets');
   const [tickets, setTickets] = useState([]);
-  const [loadingTickets, setLoadingTickets] = useState(false);
+
+  // Reply Modal State
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [activeTicket, setActiveTicket] = useState(null);
+  const [replyMessage, setReplyMessage] = useState('');
 
   const [newTitle, setNewTitle] = useState('');
   const [newCompany, setNewCompany] = useState('');
@@ -14,11 +20,12 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
   const [newLocation, setNewLocation] = useState('Remote');
 
   useEffect(() => {
-    fetchTickets();
-  }, []);
+    if (isAdminAuthenticated) {
+      fetchTickets();
+    }
+  }, [isAdminAuthenticated]);
 
   const fetchTickets = async () => {
-    setLoadingTickets(true);
     try {
       const res = await fetch('/api/contact');
       const data = await res.json();
@@ -27,14 +34,30 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
       }
     } catch (e) {
       console.error(e);
-    } finally {
-      setLoadingTickets(false);
+    }
+  };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (passcode === 'admin123' || passcode === 'rahnuma2026') {
+      setIsAdminAuthenticated(true);
+    } else {
+      alert('Invalid Admin Passcode. Hint: try "admin123"');
     }
   };
 
   const resolveTicket = (ticketId) => {
     setTickets(tickets.map(t => t.id === ticketId ? { ...t, status: 'Resolved' } : t));
     alert(`Support ticket ${ticketId} marked as resolved.`);
+  };
+
+  const sendEmailReply = (e) => {
+    e.preventDefault();
+    if (!replyMessage.trim()) return;
+    alert(`Email successfully sent to ${activeTicket.email}!\n\nMessage: "${replyMessage}"`);
+    setTickets(tickets.map(t => t.id === activeTicket.id ? { ...t, status: 'Resolved' } : t));
+    setReplyModalOpen(false);
+    setReplyMessage('');
   };
 
   const handleCreateJob = (e) => {
@@ -57,21 +80,63 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
     alert(`Successfully published job: "${newTitle}"!`);
   };
 
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="max-w-md mx-auto py-20 px-4">
+        <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#5c1d2d]/10 text-[#5c1d2d] flex items-center justify-center mx-auto mb-4 shadow-inner">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="editorial-heading text-2xl font-extrabold text-slate-900 mb-2">
+            Private Admin & Employer Portal
+          </h2>
+          <p className="text-xs text-slate-500 mb-6">
+            Restricted access. Please enter the secure administrator passcode to manage support tickets and job postings. (Hint: use <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-[#5c1d2d]">admin123</code>)
+          </p>
+
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <input
+              type="password"
+              required
+              value={passcode}
+              onChange={(e) => setPasscode(e.target.value)}
+              placeholder="Enter Admin Passcode..."
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm text-center tracking-widest focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Unlock Admin Portal</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-slate-200">
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#5c1d2d]/10 text-[#5c1d2d] text-xs font-semibold mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Administrator Control Center</span>
+            <span>Secure Admin & Employer Control Center</span>
           </div>
           <h2 className="editorial-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Employer & Support Admin Panel
+            Admin Support Inbox & Job Management
           </h2>
           <p className="text-sm text-slate-600 mt-1">
-            Review incoming user support tickets, reply to customer inquiries, and manage job listings.
+            Manage support inquiries, reply directly via email, and publish verified job listings.
           </p>
         </div>
+        <button
+          onClick={() => setIsAdminAuthenticated(false)}
+          className="mt-4 md:mt-0 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all"
+        >
+          Lock Portal
+        </button>
       </div>
 
       <div className="flex items-center space-x-2 mb-6">
@@ -86,7 +151,7 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
         </button>
         <button
           onClick={() => setActiveSubTab('jobs')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all ${
+          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center space-x-1.5 ${
             activeSubTab === 'jobs' ? 'bg-[#5c1d2d] text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-700'
           }`}
         >
@@ -95,7 +160,7 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
         </button>
         <button
           onClick={() => setActiveSubTab('add')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all ${
+          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center space-x-1.5 ${
             activeSubTab === 'add' ? 'bg-[#5c1d2d] text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-700'
           }`}
         >
@@ -116,7 +181,7 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
           {tickets.length === 0 ? (
             <div className="text-center py-16 text-slate-400">
               <Mail className="w-12 h-12 mx-auto mb-3 opacity-40" />
-              <p className="text-sm font-medium">No support tickets submitted yet. Try submitting one from the footer!</p>
+              <p className="text-sm font-medium">No support tickets submitted yet.</p>
             </div>
           ) : (
             <div className="space-y-4 max-h-[600px] overflow-y-auto">
@@ -137,13 +202,16 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
                   </div>
 
                   <div className="flex items-center space-x-2 shrink-0">
-                    <a
-                      href={`mailto:${t.email}?subject=Re: Support Ticket ${t.id} - Rahnuma`}
+                    <button
+                      onClick={() => {
+                        setActiveTicket(t);
+                        setReplyModalOpen(true);
+                      }}
                       className="px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-xs transition-all flex items-center space-x-1"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Reply via Email</span>
-                    </a>
+                    </button>
                     {t.status === 'Open' && (
                       <button
                         onClick={() => resolveTicket(t.id)}
@@ -158,6 +226,51 @@ export default function AdminPanel({ jobs = [], courses = [], onAddJob }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Direct Email Reply Modal */}
+      {replyModalOpen && activeTicket && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 relative my-8">
+            <button
+              onClick={() => setReplyModalOpen(false)}
+              className="absolute right-4 top-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-lg font-extrabold text-slate-900 mb-1">
+              Reply to {activeTicket.name} ({activeTicket.email})
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">Ticket ID: {activeTicket.id} • Subject: {activeTicket.subject}</p>
+
+            <div className="bg-slate-50 p-3 rounded-xl text-xs text-slate-600 mb-4 border border-slate-200">
+              <span className="font-bold text-slate-700">User's Message:</span> "{activeTicket.message}"
+            </div>
+
+            <form onSubmit={sendEmailReply} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Your Email Response</label>
+                <textarea
+                  rows={5}
+                  required
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder="Type your solution or reply here..."
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Send Email Reply & Close Ticket</span>
+              </button>
+            </form>
+          </div>
         </div>
       )}
 

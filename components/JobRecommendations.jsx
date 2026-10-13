@@ -34,8 +34,6 @@ export default function JobRecommendations({
   const handleApply = (job) => {
     setAppliedJobIds({ ...appliedJobIds, [job.job_id]: true });
     onApplyJob(job);
-    
-    // Open company application portal in new tab
     const portalUrl = job.apply_url || `https://www.google.com/search?q=${encodeURIComponent(job.company + ' ' + job.title + ' careers apply')}`;
     window.open(portalUrl, '_blank');
   };
@@ -60,12 +58,21 @@ export default function JobRecommendations({
           userSkills: job.required_skills
         })
       });
+
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned non-JSON response');
+      }
+
       const data = await res.json();
       if (data.success) {
         setCoverVariants(data.data);
+      } else {
+        alert(data.error || 'Failed to generate cover letter.');
       }
     } catch (e) {
       console.error(e);
+      alert('Error generating cover letter: ' + e.message);
     } finally {
       setCoverLoading(false);
     }

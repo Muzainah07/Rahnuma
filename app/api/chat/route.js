@@ -1,21 +1,19 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'GEMINI_API_KEY is missing. Please make sure you created a .env file in your project root with GEMINI_API_KEY="your_api_key" and restarted your server (use "npm run dev").' 
-        },
+        { success: false, error: 'GEMINI_API_KEY is missing.' },
         { status: 500 }
       );
     }
 
     const ai = new GoogleGenAI({ apiKey });
-
     const { messages, userProfile } = await req.json();
 
     const systemInstruction = `
