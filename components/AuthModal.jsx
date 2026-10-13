@@ -16,6 +16,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
   const [enteredOtp, setEnteredOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successNotice, setSuccessNotice] = useState('');
 
   if (!isOpen) return null;
 
@@ -42,7 +43,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         }
       }
 
-      // Generate 6-digit verification code and dispatch via backend API
+      // Generate 6-digit confirmation code and dispatch via backend email service
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedOtp(code);
 
@@ -58,6 +59,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
       }
 
       setLoading(false);
+      setSuccessNotice(`A formal verification email with your 6-digit code has been sent to ${email}.`);
       setStep('otp');
     } catch (err) {
       console.error(err);
@@ -82,6 +84,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
     onLogin(userObj);
     setStep('form');
     setEnteredOtp('');
+    setSuccessNotice('');
     onClose();
   };
 
@@ -89,7 +92,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-y-auto max-h-[85vh] p-6 relative my-8">
         <button
-          onClick={() => { setStep('form'); onClose(); }}
+          onClick={() => { setStep('form'); setSuccessNotice(''); onClose(); }}
           className="absolute right-4 top-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
         >
           <X className="w-5 h-5" />
@@ -100,12 +103,12 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
             {step === 'otp' ? <ShieldCheck className="w-6 h-6" /> : 'ر'}
           </div>
           <h3 className="text-xl font-extrabold text-slate-900">
-            {step === 'otp' ? 'Email Verification Required' : isSignUp ? 'Join Rahnuma Pakistan' : 'Welcome Back'}
+            {step === 'otp' ? 'Check Your Email Inbox' : isSignUp ? 'Join Rahnuma Pakistan' : 'Welcome Back'}
           </h3>
           <p className="text-xs text-slate-500 mt-1">
             {step === 'otp'
-              ? `We have dispatched a secure 6-digit verification code to ${email}. Please check your email inbox to confirm it is you.`
-              : 'Secure authentication with email verification code.'}
+              ? successNotice
+              : 'Secure authentication with formal email verification.'}
           </p>
         </div>
 
@@ -129,7 +132,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-center tracking-widest text-lg font-bold focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
               />
               <p className="text-[11px] text-slate-400 mt-2 text-center">
-                (Check your terminal server console log for the dispatched email code)
+                Please check your email client for the formal verification code message.
               </p>
             </div>
 
@@ -220,9 +223,9 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
               className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
             >
               {loading ? (
-            <>
+                <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Dispatching Email Code...</span>
+                  <span>Sending Formal Email...</span>
                 </>
               ) : (
                 <>
