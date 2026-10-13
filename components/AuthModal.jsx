@@ -59,7 +59,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
       }
 
       setLoading(false);
-      setSuccessNotice(`A formal verification email with your 6-digit code has been sent to ${email}.`);
+      setSuccessNotice(`A formal verification email with your 6-digit code has been dispatched to ${email}.`);
       setStep('otp');
     } catch (err) {
       console.error(err);
@@ -131,8 +131,8 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
                 placeholder="123456"
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-center tracking-widest text-lg font-bold focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 mt-2 text-center">
-                Please check your email client for the formal verification code message.
+              <p className="text-[11px] text-slate-500 mt-2 text-center font-medium">
+                Please check your email client (Gmail or Outlook) for your 6-digit confirmation code.
               </p>
             </div>
 
