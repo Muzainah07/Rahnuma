@@ -1,98 +1,55 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Lock, Mail, MapPin, X, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
+import { User, Lock, Mail, MapPin, X, CheckCircle2, Loader2, ShieldCheck, MailCheck, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AuthModal({ isOpen, onClose, onLogin }) {
-  const [isSignUp, setIsSignUp] = useState(true);
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [city, setCity] = useState('Karachi');
-  
-  const [step, setStep] = useState('form'); // 'form' or 'otp'
-  const [generatedOtp, setGeneratedOtp] = useState('');
-  const [enteredOtp, setEnteredOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successNotice, setSuccessNotice] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSendMagicLink = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address.');
+      return;
+    }
     setLoading(true);
 
     try {
-      if (supabase) {
-        if (isSignUp) {
-          const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { full_name: name, city } }
-          });
-          if (error) throw error;
-        } else {
-          const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-          if (error) throw error;
-        }
+      if (!supabase) {
+        throw new Error('Supabase is not configured. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env file.');
       }
 
-      // Generate 6-digit confirmation code and dispatch via backend email service
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(code);
-
-      const res = await fetch('/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
+      // Send Supabase Magic Link / Email OTP
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin,
+        },
       });
-      const data = await res.json();
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to dispatch verification email');
-      }
+      if (error) throw error;
 
       setLoading(false);
-      setSuccessNotice(`A formal verification email with your 6-digit code has been dispatched to ${email}.`);
-      setStep('otp');
+      setLinkSent(true);
     } catch (err) {
       console.error(err);
-      setErrorMessage(err.message || 'Authentication error occurred.');
+      setErrorMessage(err.message || 'Failed to send confirmation link.');
       setLoading(false);
     }
-  };
-
-  const verifyOtpAndLogin = (e) => {
-    e.preventDefault();
-    if (enteredOtp.trim() !== generatedOtp.trim()) {
-      setErrorMessage('Invalid confirmation code. Please check your email and try again.');
-      return;
-    }
-
-    const userObj = {
-      name: name || email.split('@')[0] || 'Ayesha Siddiqui',
-      email,
-      city: city || 'Karachi',
-      joinedDate: new Date().toLocaleDateString()
-    };
-    onLogin(userObj);
-    setStep('form');
-    setEnteredOtp('');
-    setSuccessNotice('');
-    onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-y-auto max-h-[85vh] p-6 relative my-8">
         <button
-          onClick={() => { setStep('form'); setSuccessNotice(''); onClose(); }}
+          onClick={() => { setLinkSent(false); onClose(); }}
           className="absolute right-4 top-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
         >
           <X className="w-5 h-5" />
@@ -100,15 +57,15 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
 
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-[#5c1d2d]/10 text-[#5c1d2d] flex items-center justify-center mx-auto mb-3 font-bold text-xl shadow-xs">
-            {step === 'otp' ? <ShieldCheck className="w-6 h-6" /> : 'ر'}
+            {linkSent ? <MailCheck className="w-6 h-6" /> : 'ر'}
           </div>
           <h3 className="text-xl font-extrabold text-slate-900">
-            {step === 'otp' ? 'Check Your Email Inbox' : isSignUp ? 'Join Rahnuma Pakistan' : 'Welcome Back'}
+            {linkSent ? 'Check Your Email Inbox' : 'Sign In with Supabase Magic Link'}
           </h3>
           <p className="text-xs text-slate-500 mt-1">
-            {step === 'otp'
-              ? successNotice
-              : 'Secure authentication with formal email verification.'}
+            {linkSent
+              ? `We have sent a secure confirmation link to ${email}. Click the link in your email to open and sign in instantly.`
+              : 'Enter your email to receive a passwordless sign-in link via Supabase.'}
           </p>
         </div>
 
@@ -118,51 +75,32 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
           </div>
         )}
 
-        {step === 'otp' ? (
-          <form onSubmit={verifyOtpAndLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Enter 6-Digit Email Verification Code</label>
-              <input
-                type="text"
-                maxLength={6}
-                required
-                value={enteredOtp}
-                onChange={(e) => setEnteredOtp(e.target.value)}
-                placeholder="123456"
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 text-center tracking-widest text-lg font-bold focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
-              />
-              <p className="text-[11px] text-slate-500 mt-2 text-center font-medium">
-                Please check your email client (Gmail or Outlook) for your 6-digit confirmation code.
-              </p>
+        {linkSent ? (
+          <div className="text-center space-y-4 py-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+              <MailCheck className="w-8 h-8" />
             </div>
-
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Check your Gmail or Outlook inbox for the email from Supabase. Clicking the link will open your Rahnuma dashboard automatically!
+            </p>
             <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2"
+              onClick={() => {
+                onLogin({
+                  name: email.split('@')[0],
+                  email,
+                  city: 'Karachi',
+                  joinedDate: new Date().toLocaleDateString()
+                });
+                setLinkSent(false);
+                onClose();
+              }}
+              className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Verify & Complete Sign In</span>
+              Simulate Successful Click & Open
             </button>
-          </form>
+          </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
-                    placeholder="Ayesha Siddiqui"
-                  />
-                </div>
-              </div>
-            )}
-
+          <form onSubmit={handleSendMagicLink} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
               <div className="relative">
@@ -172,81 +110,30 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
+                  className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            {isSignUp && (
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">City in Pakistan</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none bg-white"
-                  >
-                    <option value="Karachi">Karachi</option>
-                    <option value="Lahore">Lahore</option>
-                    <option value="Islamabad">Islamabad</option>
-                    <option value="Rawalpindi">Rawalpindi</option>
-                    <option value="Faisalabad">Faisalabad</option>
-                    <option value="Peshawar">Peshawar</option>
-                    <option value="Quetta">Quetta</option>
-                    <option value="Multan">Multan</option>
-                    <option value="Remote">Remote / Work from Home</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Sending Formal Email...</span>
+                  <span>Sending Magic Link...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{isSignUp ? 'Sign Up & Send Email Code' : 'Sign In & Send Code'}</span>
+                  <Sparkles className="w-4 h-4 text-[#d4a373]" />
+                  <span>Send Magic Link to Email</span>
                 </>
               )}
             </button>
           </form>
-        )}
-
-        {step === 'form' && (
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-xs text-[#5c1d2d] hover:underline font-semibold"
-            >
-              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
-            </button>
-          </div>
         )}
       </div>
     </div>
