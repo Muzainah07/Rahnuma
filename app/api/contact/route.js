@@ -1,6 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,25 +63,30 @@ Return ONLY valid JSON in the following format:
     const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const ticketData = JSON.parse(cleaned);
 
-    // Send real email via Resend if API key is configured
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
-      const resend = new Resend(resendApiKey);
-      await resend.emails.send({
-        from: 'Rahnuma Support <onboarding@resend.dev>',
-        to: [email],
-        subject: `Support Ticket Received: ${ticketData.ticket_id} (${subject})`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-            <h2 style="color: #5c1d2d;">Rahnuma Support Center</h2>
-            <p>Dear ${name},</p>
-            <p>${ticketData.acknowledgment_message}</p>
-            <div style="background: #fcfaf7; padding: 12px 16px; border-radius: 8px; border: 1px solid #d4a373; margin-top: 15px;">
-              <strong>Ticket ID:</strong> ${ticketData.ticket_id}<br/>
-              <strong>Subject:</strong> ${subject}
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Rahnuma Support <onboarding@resend.dev>',
+          to: [email],
+          subject: `Support Ticket Received: ${ticketData.ticket_id} (${subject})`,
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #5c1d2d;">Rahnuma Support Center</h2>
+              <p>Dear ${name},</p>
+              <p>${ticketData.acknowledgment_message}</p>
+              <div style="background: #fcfaf7; padding: 12px 16px; border-radius: 8px; border: 1px solid #d4a373; margin-top: 15px;">
+                <strong>Ticket ID:</strong> ${ticketData.ticket_id}<br/>
+                <strong>Subject:</strong> ${subject}
+              </div>
             </div>
-          </div>
-        `
+          `
+        })
       });
     }
 

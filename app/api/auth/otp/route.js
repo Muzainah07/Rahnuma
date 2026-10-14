@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,23 +8,34 @@ export async function POST(req) {
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (resendApiKey) {
-      const resend = new Resend(resendApiKey);
-      await resend.emails.send({
-        from: 'Rahnuma <onboarding@resend.dev>',
-        to: [email],
-        subject: 'Your Rahnuma Security Verification Code',
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 24px; color: #333; max-width: 600px; margin: 0 auto; background: #fcfaf7; border-radius: 12px; border: 1px solid #d4a373;">
-            <h2 style="color: #5c1d2d; margin-top: 0;">Rahnuma Career Navigator</h2>
-            <p>Hello,</p>
-            <p>Your secure 6-digit confirmation code for signing into Rahnuma is:</p>
-            <div style="font-size: 32px; font-weight: bold; color: #5c1d2d; background: #ffffff; padding: 16px 24px; text-align: center; border-radius: 8px; border: 1px solid #d4a373; letter-spacing: 6px; margin: 20px 0;">
-              ${code}
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Rahnuma <onboarding@resend.dev>',
+          to: [email],
+          subject: 'Your Rahnuma Security Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 24px; color: #333; max-width: 600px; margin: 0 auto; background: #fcfaf7; border-radius: 12px; border: 1px solid #d4a373;">
+              <h2 style="color: #5c1d2d; margin-top: 0;">Rahnuma Career Navigator</h2>
+              <p>Hello,</p>
+              <p>Your secure 6-digit confirmation code for signing into Rahnuma is:</p>
+              <div style="font-size: 32px; font-weight: bold; color: #5c1d2d; background: #ffffff; padding: 16px 24px; text-align: center; border-radius: 8px; border: 1px solid #d4a373; letter-spacing: 6px; margin: 20px 0;">
+                ${code}
+              </div>
+              <p style="font-size: 13px; color: #666;">If you did not request this code, please ignore this email.</p>
             </div>
-            <p style="font-size: 13px; color: #666;">If you did not request this code, please ignore this email.</p>
-          </div>
-        `
+          `
+        })
       });
+
+      const result = await response.json();
+      if (!response.ok) {
+        console.error('Resend API error response:', result);
+      }
     } else {
       console.log(`[Email Dispatch Simulation] To: ${email} | Code: ${code}`);
     }
