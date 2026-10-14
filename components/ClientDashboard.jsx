@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import HomeLanding from '@/components/HomeLanding';
 import ProfileBuilder from '@/components/ProfileBuilder';
@@ -14,6 +14,7 @@ import CommunityMentors from '@/components/CommunityMentors';
 import AuthModal from '@/components/AuthModal';
 import ContactModal from '@/components/ContactModal';
 import { Compass, Heart, Mail, MapPin, ArrowLeft } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ClientDashboard({
   initialJobs,
@@ -33,6 +34,37 @@ export default function ClientDashboard({
   const [jobsList, setJobsList] = useState(initialJobs);
 
   const [urduLanguage, setUrduLanguage] = useState(false);
+
+  // Listen for Supabase Magic Link session changes on load
+  useEffect(() => {
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setCurrentUser({
+            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+            email: session.user.email,
+            city: session.user.user_metadata?.city || 'Karachi',
+            joinedDate: new Date().toLocaleDateString()
+          });
+        }
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          setCurrentUser({
+            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+            email: session.user.email,
+            city: session.user.user_metadata?.city || 'Karachi',
+            joinedDate: new Date().toLocaleDateString()
+          });
+        } else {
+          setCurrentUser(null);
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    }
+  }, []);
 
   const handleGenerateRecommendations = async (profileText, structuredData) => {
     setIsLoading(true);
@@ -82,6 +114,16 @@ export default function ClientDashboard({
 
   const hasResults = !!recommendationData;
 
+  const handleLogout = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+    setCurrentUser(null);
+    setRecommendationData(null);
+    setActiveTab('home');
+    alert('Logged out successfully.');
+  };
+
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-slate-900 flex flex-col font-sans">
       <Navbar
@@ -90,11 +132,7 @@ export default function ClientDashboard({
         hasResults={hasResults}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={() => {
-          setCurrentUser(null);
-          setActiveTab('home');
-          alert('Logged out successfully.');
-        }}
+        onLogout={handleLogout}
       />
 
       <div className="bg-[#5c1d2d] text-[#fbf9f6] py-2 px-4 text-xs font-medium flex items-center justify-between">
@@ -200,7 +238,7 @@ export default function ClientDashboard({
         onClose={() => setIsAuthOpen(false)}
         onLogin={(user) => {
           setCurrentUser(user);
-          alert(`Welcome back, ${user.name}! Account is active.`);
+          alert(`Welcome back, ${user.name}! Signed in successfully.`);
         }}
       />
 
