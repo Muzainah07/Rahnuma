@@ -84,14 +84,14 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 ## Screenshots
 
 ### ATS Resume Auditor
-![ATS Resume Auditor](./screenshots/rahnuma3.png)
+![ATS Resume Auditor](./ScreenShots/rahnuma3.png)
 
 ### AI Career Companion
-![AI Career Companion](./screenshots/rahnuma2.png)
+![AI Career Companion](./ScreenShots/rahnuma2.png)
 
 ### AI Job Matcher
-![AI Job Matcher](./screenshots/rahnuma4.png)
+![AI Job Matcher](./ScreenShots/rahnuma4.png)
 
 ### Home
-![Home Page](./screenshots/rahnuma1.png)
+![Home Page](./ScreenShots/rahnuma1.png)
 
