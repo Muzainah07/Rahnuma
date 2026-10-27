@@ -16,7 +16,7 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 
 - **Smart Job Discovery & AI Matching**: Real-time Gemini AI job recommendations tailored to skills, education, city, and pay expectations in PKR.
 - **ATS Resume Auditor & Cover Letters**: Instant CV scoring out of 100, keyword breakdown, and 3 AI cover letter variants (*Formal, Short, Pakistani Market Style*).
-- ** AI Career Companion**: 24/7 empathetic mentorship chatbot with full `react-markdown` markdown support for tables, lists, and bold text.
+- **AI Career Companion**: 24/7 empathetic mentorship chatbot with full `react-markdown` markdown support for tables, lists, and bold text.
 - **Supabase Magic Link Authentication**: Secure passwordless email authentication with instant inbox link verification.
 - **Success Stories & Alumni Network**: Searchable placement records of women working at top tech companies, banks, and remote enterprises across Pakistan.
 - **Support Ticketing Center**:In-app support ticketing with a passcode-protected admin support inbox (`NEXT_PUBLIC_ADMIN_PASSCODE`) for reviewing and replying to inquiries.
