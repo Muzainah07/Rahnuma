@@ -19,7 +19,7 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 - ** AI Career Companion**: 24/7 empathetic mentorship chatbot with full `react-markdown` markdown support for tables, lists, and bold text.
 - **Supabase Magic Link Authentication**: Secure passwordless email authentication with instant inbox link verification.
 - **Success Stories & Alumni Network**: Searchable placement records of women working at top tech companies, banks, and remote enterprises across Pakistan.
-- **Secure Support Ticketing Center**: In-app support tickets with an admin inbox for reviewing and replying to inquiries. Admin access is protected via server-side environment configuration.
+- - **Support Ticketing Center**:In-app support ticketing with a passcode-protected admin support inbox (`NEXT_PUBLIC_ADMIN_PASSCODE`) for reviewing and replying to inquiries.
 - **Bilingual Support**: Seamless English and Urdu cultural context toggle.
 
 ---
@@ -35,6 +35,11 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 
 ---
 
+## Known Limitations & Future Work
+
+- **Admin access:** The demo admin inbox uses a basic hardcoded passcode for simplicity. Production use would require server-side role-based access (e.g. Supabase Auth with row-level security).
+- **AI endpoints:** No rate limiting yet; planned.
+- **Testing:** Automated tests are not yet implemented.
 ## Local Development & Installation
 
 1. **Clone the Repository**:

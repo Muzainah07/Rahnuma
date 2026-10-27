@@ -36,8 +36,8 @@ export default function AdminSupportModal({ isOpen, onClose }) {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    // Strict admin passcode check (no hints displayed on screen)
-    if (passcode === 'rahnumaAdmin2026!' || passcode === 'admin123') {
+    const correctPasscode = process.env.NEXT_PUBLIC_ADMIN_PASSCODE || 'rahnumaAdmin2026!';
+    if (passcode === correctPasscode || passcode === 'admin123') {
       setIsAdminAuthenticated(true);
       fetchTickets();
     } else {
