@@ -79,5 +79,20 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 5. Click **Deploy**!
 
 ---
+**Live Demo:** https://rahnuma-careers.vercel.app/
+
+## Screenshots
+
+### ATS Resume Auditor
+![ATS Resume Auditor](./screenshots/rahnuma2.png)
+
+### AI Career Companion
+![AI Career Companion](./screenshots/rahnuma3.png)
+
+### AI Job Matcher
+![AI Job Matcher](./screenshots/rahnuma4.png)
+
+### Home
+![Home Page](./screenshots/rahnuma1.png)
 
 
