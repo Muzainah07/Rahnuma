@@ -26,7 +26,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         throw new Error('Supabase is not configured. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env file.');
       }
 
-      // Send Supabase Magic Link / Email OTP
+      // Send Supabase Magic Link / Email Confirmation
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -64,7 +64,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
           </h3>
           <p className="text-xs text-slate-500 mt-1">
             {linkSent
-              ? `We have sent a secure confirmation link to ${email}. Click the link in your email to open and sign in instantly.`
+              ? `We have sent a secure sign-in link to ${email}. Open your email inbox and click the link to log in automatically.`
               : 'Enter your email to receive a passwordless sign-in link via Supabase.'}
           </p>
         </div>
@@ -81,22 +81,16 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
               <MailCheck className="w-8 h-8" />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Check your Gmail or Outlook inbox for the email from Supabase. Clicking the link will open your Rahnuma dashboard automatically!
+              Check your Gmail or Outlook inbox for the email from Supabase. <strong className="text-slate-900">Clicking the link will open your Rahnuma dashboard automatically</strong> without needing any button here!
             </p>
             <button
               onClick={() => {
-                onLogin({
-                  name: email.split('@')[0],
-                  email,
-                  city: 'Karachi',
-                  joinedDate: new Date().toLocaleDateString()
-                });
                 setLinkSent(false);
                 onClose();
               }}
-              className="w-full py-3 rounded-xl bg-[#5c1d2d] hover:bg-[#4a1525] text-white font-bold text-sm shadow-md transition-all"
+              className="w-full py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-all"
             >
-              Simulate Successful Click & Open
+              Close Window
             </button>
           </div>
         ) : (

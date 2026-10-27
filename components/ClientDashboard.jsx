@@ -13,7 +13,8 @@ import ResumeAnalyzer from '@/components/ResumeAnalyzer';
 import CommunityMentors from '@/components/CommunityMentors';
 import AuthModal from '@/components/AuthModal';
 import ContactModal from '@/components/ContactModal';
-import { Compass, Heart, Mail, MapPin, ArrowLeft } from 'lucide-react';
+import AdminSupportModal from '@/components/AdminSupportModal';
+import { Compass, Heart, Mail, MapPin, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function ClientDashboard({
@@ -29,13 +30,13 @@ export default function ClientDashboard({
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isAdminSupportOpen, setIsAdminSupportOpen] = useState(false);
   const [savedJobs, setSavedJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [jobsList, setJobsList] = useState(initialJobs);
 
   const [urduLanguage, setUrduLanguage] = useState(false);
 
-  // Listen for Supabase Magic Link session changes on load
   useEffect(() => {
     if (supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => {
@@ -247,6 +248,11 @@ export default function ClientDashboard({
         onClose={() => setIsContactOpen(false)}
       />
 
+      <AdminSupportModal
+        isOpen={isAdminSupportOpen}
+        onClose={() => setIsAdminSupportOpen(false)}
+      />
+
       <footer className="bg-[#2b2628] text-slate-300 py-16 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           <div>
@@ -289,6 +295,7 @@ export default function ClientDashboard({
             <h4 className="text-xs font-bold text-white mb-4 uppercase tracking-wider">Support & Help</h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li><button onClick={() => setIsContactOpen(true)} className="hover:text-[#d4a373] transition-colors flex items-center space-x-1.5"><Mail className="w-3.5 h-3.5 text-[#d4a373]" /><span>Open Support Ticket</span></button></li>
+              <li><button onClick={() => setIsAdminSupportOpen(true)} className="hover:text-[#d4a373] transition-colors flex items-center space-x-1.5 text-slate-500 hover:text-slate-400"><ShieldCheck className="w-3.5 h-3.5" /><span>Admin Support Login</span></button></li>
               <li className="flex items-center space-x-2"><MapPin className="w-3.5 h-3.5 text-[#d4a373]" /><span>Karachi / Lahore, Pakistan</span></li>
             </ul>
           </div>
