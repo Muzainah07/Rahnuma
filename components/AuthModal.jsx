@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Lock, Mail, MapPin, X, CheckCircle2, Loader2, ShieldCheck, MailCheck, Sparkles } from 'lucide-react';
+import { User, Lock, Mail, MapPin, X, CheckCircle2, Loader2, ShieldCheck, KeyRound, Compass } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AuthModal({ isOpen, onClose, onLogin }) {
@@ -56,8 +56,8 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-[#5c1d2d]/10 text-[#5c1d2d] flex items-center justify-center mx-auto mb-3 font-bold text-xl shadow-xs">
-            {linkSent ? <MailCheck className="w-6 h-6" /> : 'ر'}
+          <div className="w-12 h-12 rounded-2xl bg-[#5c1d2d]/10 text-[#5c1d2d] flex items-center justify-center mx-auto mb-3 shadow-xs">
+            {linkSent ? <ShieldCheck className="w-6 h-6 text-[#5c1d2d]" /> : <Compass className="w-6 h-6 text-[#5c1d2d]" />}
           </div>
           <h3 className="text-xl font-extrabold text-slate-900">
             {linkSent ? 'Check Your Email Inbox' : 'Sign In with Supabase Magic Link'}
@@ -78,7 +78,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
         {linkSent ? (
           <div className="text-center space-y-4 py-4">
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-              <MailCheck className="w-8 h-8" />
+              <ShieldCheck className="w-8 h-8" />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               Check your Gmail or Outlook inbox for the email from Supabase. <strong className="text-slate-900">Clicking the link will open your Rahnuma dashboard automatically</strong> without needing any button here!
@@ -122,7 +122,7 @@ export default function AuthModal({ isOpen, onClose, onLogin }) {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-[#d4a373]" />
+                  <Compass className="w-4 h-4 text-[#d4a373]" />
                   <span>Send Magic Link to Email</span>
                 </>
               )}
