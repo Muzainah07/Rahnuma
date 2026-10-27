@@ -309,6 +309,9 @@ export default function ClientDashboard({
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
           <p>© 2026 Rahnuma Platform. All rights reserved.</p>
+          <p className="mt-2">
+    Portfolio project by Muzainah Faisal. Not affiliated with any listed company; applications go through each company&apos;s official portal.
+  </p>
         </div>
       </footer>
     </div>

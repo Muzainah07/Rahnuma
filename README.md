@@ -8,7 +8,9 @@
 
 **Rahnuma** is a full-stack portfolio project that helps women in Pakistan discover remote, hybrid, and flexible job opportunities and improve their applications with AI: ATS resume scoring, tailored cover letters, and a career mentoring chatbot. 
 
-Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Rahnuma bridges the employment gap by analyzing candidate profiles, matching them with live opportunities, auditing resumes against ATS requirements, and providing real-time mentorship.
+**Note:** Rahnuma is a portfolio project and is not affiliated with any listed company; applications go through each company's official portal.
+
+Rahnuma bridges the employment gap by analyzing candidate profiles, matching them with live opportunities, auditing resumes against ATS requirements, and providing real-time mentorship.
 
 ---
 
