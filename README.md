@@ -6,7 +6,7 @@
 
 ## Overview
 
-**Rahnuma** is a professional, production-grade career and employment platform designed to connect women with verified remote, hybrid, and flexible employment opportunities. 
+**Rahnuma** is a full-stack portfolio project that helps women in Pakistan discover remote, hybrid, and flexible job opportunities and improve their applications with AI: ATS resume scoring, tailored cover letters, and a career mentoring chatbot. 
 
 Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Rahnuma bridges the employment gap by analyzing candidate profiles, matching them with live opportunities, auditing resumes against ATS requirements, and providing real-time mentorship.
 
@@ -19,7 +19,7 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 - ** AI Career Companion**: 24/7 empathetic mentorship chatbot with full `react-markdown` markdown support for tables, lists, and bold text.
 - **Supabase Magic Link Authentication**: Secure passwordless email authentication with instant inbox link verification.
 - **Success Stories & Alumni Network**: Searchable placement records of women working at top tech companies, banks, and remote enterprises across Pakistan.
-- **Secure Support Ticketing Center**: In-app support ticketing with a passcode-protected admin support inbox (`admin123`) for reviewing and replying to inquiries.
+- **Secure Support Ticketing Center**: In-app support tickets with an admin inbox for reviewing and replying to inquiries. Admin access is protected via server-side environment configuration.
 - **Bilingual Support**: Seamless English and Urdu cultural context toggle.
 
 ---
@@ -75,6 +75,4 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 
 ---
 
-## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
