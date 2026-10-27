@@ -152,11 +152,17 @@ export default function ClientDashboard({
         <div className="bg-white border-b border-slate-200 py-3 px-4 sm:px-8 shadow-2xs">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <button
-              onClick={() => setActiveTab('home')}
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  setActiveTab('home');
+                }
+              }}
               className="group inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#5c1d2d] text-white text-xs font-bold shadow-xs hover:bg-[#4a1525] transition-all transform hover:-translate-x-0.5"
             >
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span>Back to Home</span>
+              <span>Back</span>
             </button>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Section: <span className="text-[#5c1d2d] font-bold">{activeTab}</span>
