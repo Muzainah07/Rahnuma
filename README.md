@@ -95,4 +95,3 @@ Powered by **Google Gemini AI (Flash Lite)** and **Next.js 15 (App Router)**, Ra
 ### Home
 ![Home Page](./screenshots/rahnuma1.png)
 
-
