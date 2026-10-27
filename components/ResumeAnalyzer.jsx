@@ -4,10 +4,8 @@ import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2, Loader2, Wand2, ArrowLeft } from 'lucide-react';
 
 export default function ResumeAnalyzer({ userSkills = [], onBack }) {
-  const [resumeText, setResumeText] = useState(
-    'Ayesha Siddiqui\nKarachi, Pakistan | ayesha@example.com\nEducation: BS Computer Science (Fresh Graduate)\nSkills: HTML/CSS, JavaScript, React.js, Git\nExperience: Web Development Intern at local tech startup (3 months). Created responsive landing pages and assisted with debugging.'
-  );
-  const [targetRole, setTargetRole] = useState('Frontend React Developer');
+  const [resumeText, setResumeText] = useState('');
+  const [targetRole, setTargetRole] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -23,7 +21,7 @@ export default function ResumeAnalyzer({ userSkills = [], onBack }) {
         body: JSON.stringify({
           action: 'ats_score',
           resumeText,
-          jobTitle: targetRole,
+          jobTitle: targetRole || 'Professional Role',
           userSkills
         })
       });
@@ -84,18 +82,19 @@ export default function ResumeAnalyzer({ userSkills = [], onBack }) {
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
-                placeholder="e.g. Frontend React Developer"
+                placeholder="e.g. Frontend React Developer, Digital Marketer..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Paste Resume Content / Summary</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Paste Your Resume Content</label>
               <textarea
                 rows={8}
                 required
                 value={resumeText}
                 onChange={(e) => setResumeText(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none font-mono text-xs"
+                placeholder="Paste your education, skills, work experience, and projects here..."
               />
             </div>
 
@@ -123,7 +122,7 @@ export default function ResumeAnalyzer({ userSkills = [], onBack }) {
           {!result ? (
             <div className="text-center py-20 text-slate-400">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm font-medium">Submit your resume text on the left to view the ATS score and analysis report.</p>
+              <p className="text-sm font-medium">Paste your resume text on the left and click "Run ATS Resume Audit" to view your score.</p>
             </div>
           ) : (
             <div className="space-y-6">
