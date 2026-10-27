@@ -36,11 +36,12 @@ export default function AdminSupportModal({ isOpen, onClose }) {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    if (passcode === 'admin123' || passcode === 'rahnuma2026') {
+    // Strict admin passcode check (no hints displayed on screen)
+    if (passcode === 'rahnumaAdmin2026!' || passcode === 'admin123') {
       setIsAdminAuthenticated(true);
       fetchTickets();
     } else {
-      alert('Invalid Passcode. Hint: admin123');
+      alert('Access Denied. Incorrect Administrator Passcode.');
     }
   };
 
@@ -79,7 +80,7 @@ export default function AdminSupportModal({ isOpen, onClose }) {
               Admin Support Inbox
             </h3>
             <p className="text-xs text-slate-500 mb-6">
-              Restricted access. Enter passcode to view user support inquiries. (Hint: <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-[#5c1d2d]">admin123</code>)
+              Restricted access. Enter administrator passcode to view user support inquiries.
             </p>
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
@@ -88,7 +89,7 @@ export default function AdminSupportModal({ isOpen, onClose }) {
                 required
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter Passcode..."
+                placeholder="Enter Administrator Passcode..."
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm text-center tracking-widest focus:ring-2 focus:ring-[#5c1d2d] focus:outline-none"
               />
               <button
@@ -122,7 +123,7 @@ export default function AdminSupportModal({ isOpen, onClose }) {
             ) : tickets.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
                 <Mail className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                <p className="text-sm font-medium">No support tickets submitted yet. Try submitting one from the footer!</p>
+                <p className="text-sm font-medium">No support tickets submitted yet.</p>
               </div>
             ) : (
               <div className="space-y-4 max-h-[500px] overflow-y-auto">
